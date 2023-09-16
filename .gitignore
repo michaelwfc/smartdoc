@@ -1,4 +1,7 @@
 # Byte-compiled / optimized / DLL files
+extrernal_libs/
+Langchain-Chatchat/
+tutorials
 __pycache__/
 *.py[cod]
 *$py.class

@@ -1,0 +1,50 @@
+{
+    "workbench.settings.editor": "json",
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "terminal.integrated.fontSize": 12,
+    // Specifies an optional working directory for tests.
+    "python.defaultInterpreterPath": "C:\\Users\\Administrator\\miniconda3\\envs\\py39",
+    "python.testing.cwd": "src/",
+    "python.testing.pytestEnabled": true,
+    //Indicates whether to automatically add search paths based on some predefined names (like src)
+    "python.analysis.autoSearchPaths": true,
+    //Specifies extra search paths for import resolution.
+    "python.analysis.extraPaths": ["${workspaceFolder}${pathSeparator}Langchain-Chatchat"],
+    // "python.analysis.autoImportCompletions":true,
+    // "python.linting.enabled": false,
+    // "python.linting.pylintEnabled": false,
+    "python.formatting.provider": "autopep8",
+    
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.autopep8",
+      "editor.formatOnType": true
+    },
+  
+    "markdown-preview-github-styles.colorTheme": "light",
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+  
+    "autoDocstring.docstringFormat": "google-notypes",
+    "files.autoSave": "off",
+    "files.exclude": {
+      "**/node_modules": true,
+      "**/.git": true,
+      "**/.svn": true,
+      "**/.hg": true,
+      "**/CVS": true,
+      "**/.DS_Store": true,
+      "**/Thumbs.db": true
+    },
+  
+    "workbench.colorTheme": "Monokai",
+    "workbench.iconTheme": "vscode-icons",
+    "vsicons.dontShowNewVersionMessage": true,
+    "window.zoomLevel": 1,
+    "editor.fontSize": 12,
+    "editor.formatOnSave": true,
+    "editor.fontFamily": "Consolas, 'Courier New', monospace",
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false
+  }
+  
