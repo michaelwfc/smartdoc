@@ -43,6 +43,9 @@ def set_gpt_env(use_openai=True,use_azure_openai=False, use_vicuna=False)-> Dict
     os.environ[NLTK_DATA] = NLTK_DATA_PATH
     os.environ[TIKTOKEN_CACHE_DIR] = TIKTOKEN_CACHE_PATH
 
+    # add TESSERACT_PATH to env PATH
+    os.environ["PATH"] = os.environ["PATH"] +";" + os.environ["TESSERACT_PATH"]
+
     if use_openai:
         openai.api_key = os.getenv(OPENAI_API_KEY)
     elif use_azure_openai:

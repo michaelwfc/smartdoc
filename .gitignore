@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
 .idea/
+data/tmp_files/
+data/vector_stores/
 extrernal_libs/
 Langchain-Chatchat/
 tutorials

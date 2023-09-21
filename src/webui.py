@@ -20,6 +20,8 @@ import time
 from typing import Text, List
 import json
 import requests
+
+from utils.io import get_file_type
 from utils.loggers import init_logger
 from vectorstores.vs_builders import VectorStoreBuilder
 
@@ -371,8 +373,9 @@ def build_vectore_store(vs_path_state: gr_State, file_status_state: gr_State, ch
             shutil.move(file.name, os.path.join(temp_file_dir, filename))
             filelist.append(os.path.join(temp_file_dir, filename))
 
+        file_types = ",".join([ get_file_type(file) for file in filelist])
         vs_path, loaded_files = vs_builder.init_knowledge_vector_store(filepath=filelist)
-        file_status = "<font color=Blue>**Success to load file!**</font>"
+        file_status = f"<font color=Blue>**Success to load {file_types} file!**</font>"
 
     except Exception as e:
         vs_path = ""

@@ -10,7 +10,8 @@
 
 import os
 from typing import List,Text
-from langchain.document_loaders import UnstructuredMarkdownLoader, UnstructuredFileLoader, TextLoader, CSVLoader, PyPDFLoader
+from langchain.document_loaders import UnstructuredMarkdownLoader, UnstructuredFileLoader, TextLoader, CSVLoader, \
+    PyPDFLoader, UnstructuredImageLoader
 from langchain.docstore.document import Document
 # from loaders.pdf_loader import UnstructuredPaddleImageLoader, UnstructuredPaddlePDFLoader
 from textsplitters.textspliter_utils import get_text_splitter
@@ -50,10 +51,12 @@ def load_langchain_docs(filepath, language=ENGLISH,
         loader = PyPDFLoader(filepath)
         textsplitter = get_text_splitter(language=language,pdf=True, sentence_size=sentence_size)
         docs = loader.load_and_split(textsplitter)
-        # elif filepath.lower().endswith(".jpg") or filepath.lower().endswith(".png"):
-        #     loader = UnstructuredPaddleImageLoader(filepath, mode="elements")
-        #     textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
-        #     docs = loader.load_and_split(text_splitter=textsplitter)
+    elif filepath.lower().endswith(".jpg") or filepath.lower().endswith(".png"):
+        # loader = UnstructuredPaddleImageLoader(filepath, mode="elements")
+        # textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
+        loader = UnstructuredImageLoader(filepath,mode="elements")
+        textsplitter = get_text_splitter(language=language, pdf=False, sentence_size=sentence_size)
+        docs = loader.load_and_split(text_splitter=textsplitter)
     elif filepath.lower().endswith(".csv"):
         loader = CSVLoader(filepath)
         docs = loader.load()

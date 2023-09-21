@@ -30,3 +30,21 @@ def tree(filepath, ignore_dir_names=None, ignore_file_names=None):
                 if os.path.isdir(fullfilepath) and os.path.basename(fullfilepath) not in ignore_dir_names:
                     ret_list.extend(tree(fullfilepath, ignore_dir_names, ignore_file_names)[0])
     return ret_list, [os.path.basename(p) for p in ret_list]
+
+
+def get_file_type(filepath):
+    if filepath.lower().endswith(".md"):
+        file_type = "markdown"
+    elif filepath.lower().endswith(".txt"):
+        file_type = "text"
+    elif filepath.lower().endswith(".pdf"):
+        file_type = "pdf"
+    elif filepath.lower().endswith(".jpg"):
+        file_type = "jpg"
+    elif filepath.lower().endswith(".png"):
+        file_type = "png"
+    elif filepath.lower().endswith(".csv"):
+        file_type = "csv"
+    else:
+        file_type = "unknown"
+    return file_type
