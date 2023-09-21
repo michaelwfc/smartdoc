@@ -81,8 +81,9 @@ def build_demo(models, args):
          textbox,
          send_btn,
          button_row,
-         parameter_row,
-         doc_uploader_row
+         # parameter_row,
+         query_templates_column,
+         doc_uploader_row,
          ) = build_single_model_ui(models)
 
         demo.load(
@@ -96,7 +97,8 @@ def build_demo(models, args):
              textbox,
              send_btn,
              button_row,
-             parameter_row,
+             # parameter_row,
+             query_templates_column,
              doc_uploader_row
              ],
             _js=get_window_url_params_js,
@@ -143,9 +145,10 @@ def load_demo_single(models, url_params):
         gr.Textbox.update(visible=True),
         gr.Button.update(visible=True),
         gr.Row.update(visible=True),
-        gr.Accordion.update(visible=True),
-        # gr.Audio.update(visible=True)  # add
-        # gr.File.update(visible=True),
+        # remote parameters row
+        # gr.Accordion.update(visible=True),
+        # add query templates
+        gr.Column.update(visible=True),
         gr.File.update(visible=True)
     )
 
@@ -189,37 +192,42 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
                                       show_label=True,
                                       visible=True)
 
-            # build Parameters Accordion
-            with gr.Accordion("Parameters", open=True, visible=True) as parameter_row:
-                temperature = gr.Slider(
-                    minimum=0.0,
-                    maximum=1.0,
-                    value=0.7,
-                    step=0.1,
-                    interactive=True,
-                    label="Temperature",
-                )
-                top_p = gr.Slider(
-                    minimum=0.0,
-                    maximum=1.0,
-                    value=1.0,
-                    step=0.1,
-                    interactive=True,
-                    label="Top P",
-                )
-                max_output_tokens = gr.Slider(
-                    minimum=16,
-                    maximum=1024,
-                    value=512,
-                    step=64,
-                    interactive=True,
-                    label="Max output tokens",
-                )
-    # change event: input the files and update the vs_path_state
-    files_input.change(build_vectore_store,
-                       inputs=[vs_path_state, file_status_state, chatbot, model_selector, files_input],
-                       outputs=[vs_path_state, file_status_state, chatbot], show_progress=True)
+            # build Business Query Templates
+            with gr.Accordion("Business Query Templates", open=True, visible=True) as query_templates_column:
+                with gr.Column(scale=1, min_width=50):
+                    query_01 = gr.Textbox(label="query_01",show_label=True, value="What is Information of the Manager?")
+                    query_02 = gr.Textbox(label="query_02",show_label=True, value="What is the Investment Objectives?")
+                    query_03 = gr.Textbox(label="query_03",show_label=True, value="How about Interest Rate Risk?")
 
+
+
+
+    # build Parameters Accordion
+    with gr.Accordion("Parameters", open=False, visible=False) as parameter_row:
+        temperature = gr.Slider(
+            minimum=0.0,
+            maximum=1.0,
+            value=0.7,
+            step=0.1,
+            interactive=True,
+            label="Temperature",
+        )
+        top_p = gr.Slider(
+            minimum=0.0,
+            maximum=1.0,
+            value=1.0,
+            step=0.1,
+            interactive=True,
+            label="Top P",
+        )
+        max_output_tokens = gr.Slider(
+            minimum=16,
+            maximum=1024,
+            value=512,
+            step=64,
+            interactive=True,
+            label="Max output tokens",
+        )
 
     # build the textbox and send botton
     with gr.Row():
@@ -274,6 +282,30 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
     model_selector.change(clear_history, None, [
         state, chatbot, textbox] + btn_list)
 
+    # change event: input the files and update the vs_path_state
+    # upload pdf event: build_vectore_store -> add_query -> bot_response
+    files_input.change(build_vectore_store,
+                       inputs=[vs_path_state, file_status_state, chatbot, model_selector, files_input],
+                       outputs=[vs_path_state, file_status_state, chatbot], show_progress=True)\
+        .then(add_query,
+              [state, model_selector, query_01],
+              [state, chatbot, textbox] + btn_list)\
+        .then(bot_response,
+            [state, vs_path_state, chatbot, model_selector, temperature, top_p, max_output_tokens],
+            [state, chatbot] + btn_list)\
+        .then(add_query,
+              [state, model_selector, query_02],
+              [state, chatbot, textbox] + btn_list)\
+        .then(bot_response,
+            [state, vs_path_state, chatbot, model_selector, temperature, top_p, max_output_tokens],
+            [state, chatbot] + btn_list) \
+        .then(add_query,
+              [state, model_selector, query_03],
+              [state, chatbot, textbox] + btn_list) \
+        .then(bot_response,
+              [state, vs_path_state, chatbot, model_selector, temperature, top_p, max_output_tokens],
+              [state, chatbot] + btn_list)
+
     #  add_text to state in textbox submit
     textbox.submit(
         add_text, [state, model_selector, textbox], [
@@ -294,26 +326,9 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
         [state, chatbot] + btn_list,
     )
 
-    # add load_file_button event
-    # load_file_button.click(get_vector_store,
-    #                        show_progress=True,
-    #                        inputs=[select_vs, files, sentence_size, chatbot, vs_add, vs_add],
-    #                        outputs=[vs_path, files, chatbot, files_to_delete], )
-
-    # add ars model
-    # whisper_pipeline = load_whiper_pipeline()
-    # # partial_transcribe = partial(transcribe_audio, model=whisper_pipeline)
-    # transcribe_audio =  transcribe_audio_outer(model=whisper_pipeline)
-
-    # with gr.Accordion("Transcribe Audio", open=False, visible=False) as audio_transcriber:
-    #     # with gr.Row():
-    #     with gr.Column(scale=20):
-    #         audio_input = Audio(source="upload", type="filepath")
-
-    # audio_input.change(transcribe_audio, [state, model_selector, audio_input], [state, chatbot, textbox] + btn_list)
 
     return vs_path_state, file_status_state, model_status_state, \
-        state, model_selector, chatbot, textbox, send_btn, button_row, parameter_row, doc_uploader_row
+        state, model_selector, chatbot, textbox, send_btn, button_row,  query_templates_column,  doc_uploader_row
 
 
 def add_text(state: gr_State, model_selector: Text, text: Text, request: gr.Request):
@@ -358,6 +373,57 @@ def add_text(state: gr_State, model_selector: Text, text: Text, request: gr.Requ
     return (state, state.to_gradio_chatbot(), "") + (disable_btn,) * 5
 
 
+def add_query(state: gr_State, model_selector: Text, text: Text, request: gr.Request):
+    """
+    add query to
+    Args:
+        state:
+        model_selector:
+        text:
+        request:
+
+    Returns:
+
+    """
+    ip = request.client.host
+    if state is None:
+        state = State(model_selector)
+
+    if len(text) <= 0:
+        state.skip_next = True
+        return (state, state.to_gradio_chatbot(), "") + (no_change_btn,) * 5
+
+    if ip_expiration_dict[ip] < time.time():
+        logger.info(f"inactive. ip: {request.client.host}. text: {text}")
+        state.skip_next = True
+        return (state, state.to_gradio_chatbot(), INACTIVE_MSG) + (no_change_btn,) * 5
+
+    if enable_moderation:
+        flagged = violates_moderation(text)
+        if flagged:
+            logger.info(
+                f"violate moderation. ip: {request.client.host}. text: {text}")
+            state.skip_next = True
+            return (state, state.to_gradio_chatbot(), MODERATION_MSG) + (
+                no_change_btn,
+            ) * 5
+
+    # from fastchat.conversation import Conversation
+    conv: Conversation = state.conv
+    if (len(conv.messages) - conv.offset) // 2 >= CONVERSATION_TURN_LIMIT:
+        logger.info(
+            f"conversation turn limit. ip: {request.client.host}. text: {text}")
+        state.skip_next = True
+        return (state, state.to_gradio_chatbot(), CONVERSATION_LIMIT_MSG) + (
+            no_change_btn,
+        ) * 5
+
+    conv.append_message(conv.roles[0], text)
+    conv.append_message(conv.roles[1], None)
+    return (state, state.to_gradio_chatbot(), "") + (disable_btn,) * 5
+
+
+
 def build_vectore_store(vs_path_state: gr_State, file_status_state: gr_State, chatbot: gr.Chatbot,
                         model_selector: Text, files: List[Text], request: gr.Request):
     try:
@@ -397,6 +463,7 @@ def bot_response(state: State, vs_path_state: gr.State, chat_history: gr.Chatbot
     temperature = float(temperature)
     top_p = float(top_p)
     max_new_tokens = int(max_new_tokens)
+
 
     if state.skip_next:
         # This generate call is skipped due to invalid inputs

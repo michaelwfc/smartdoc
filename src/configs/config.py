@@ -26,7 +26,7 @@ CHATDOC = "CHATDOC"
 DEFAULT_TOPIC = "DEFAULT"
 SUPPORT_TOPICS = [ CHATDOC,CHATDATA,DEFAULT_TOPIC]
 
-SUPPORT_MODELS = ["openai-gpt3.5","azure-openai-gpt3.5","vicunba-7b"]
+SUPPORT_MODELS = ["azure-openai-gpt3.5","openai-gpt3.5","vicunba-7b","llama2-7b"]
 # LLM model name
 LLM_MODEL = "azure_openai"
 OPENAI_API_VERSION = "2023-05-15"
