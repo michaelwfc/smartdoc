@@ -1,6 +1,8 @@
 # SmartDoc
 This repository is for hackathon2023
 
+# model structure
+![model_structure](images/smartdoc-structure.jpg)
 # run the webui
 1. prepare the virtual env
 ```shell 
