@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 USE_OPENAI = True
 USE_AZURE_OPENAI = False
 USE_VICUNA= False
-GRADIO_SERVER_PORT = 7860
+GRADIO_SERVER_PORT = 9000
 
 # Support apps
 CHATDATA = "CHATDATA"
