@@ -383,8 +383,8 @@ def add_query(state: gr_State, model_selector: Text, text: Text, request: gr.Req
         request:
 
     Returns:
-
     """
+    time.sleep(1)
     ip = request.client.host
     if state is None:
         state = State(model_selector)

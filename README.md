@@ -20,15 +20,13 @@ cd src
 python webui.py  
 ```
 
-[//]: # (![chatdoc-webui]&#40;images/chatdoc-webui.jpg&#41;)
+![smartdoc-webui](images/smartdoc-webui.png)
 
 3. upload the pdf and process the pdf
+![upload-pdf](images/upload-pdf.png)
 
-[//]: # (![upload-pdf]&#40;images/chatdoc-upload-pdf.jpg&#41;)
-
-4. ask the question and get the answer  
-
-[//]: # (![chat-in-webui]&#40;images/chatdoc-chat.jpg&#41;)
+4. ask the business queries and get the answer  
+![answer-queries](images/webui-query-templates-01.png)
 
 
 # server configs
