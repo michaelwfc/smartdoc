@@ -20,13 +20,15 @@ cd src
 python webui.py  
 ```
 
-![smartdoc-webui](images/smartdoc-webui.png)
+![smartdoc-webui](images/smartdoc-webui-v2.png)
 
 3. upload the pdf and process the pdf
-![upload-pdf](images/upload-pdf.png)
+
+[//]: # (![upload-pdf]&#40;images/v1/upload-pdf.png&#41;)
 
 4. ask the business queries and get the answer  
-![answer-queries](images/webui-query-templates-01.png)
+
+[//]: # (![answer-queries]&#40;images/v1/webui-query-templates-01.png&#41;)
 
 
 # server configs

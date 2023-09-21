@@ -163,16 +163,9 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
     notice_markdown = f"""# {PROJECT_NAME}"""
     gr.Markdown(notice_markdown, elem_id="notice_markdown")
 
-    with gr.Row():
-        with gr.Column(scale=15):
-            # build the chatbot
-            chatbot = gr.Chatbot(
-                elem_id="chatbot",
-                label="Scroll down and start chatting",
-                visible=False,
-                height=550,
 
-            )
+    with gr.Row():
+
         # build the model_selector_row, set visible= False
         with gr.Column(elem_id="model_input_column", visible=True, scale=1):
             with gr.Row(elem_id="model_selector_row", visible=True):
@@ -199,8 +192,14 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
                     query_02 = gr.Textbox(label="query_02",show_label=True, value="What is the Investment Objectives?")
                     query_03 = gr.Textbox(label="query_03",show_label=True, value="How about Interest Rate Risk?")
 
-
-
+        with gr.Column(scale=15):
+            # build the chatbot
+            chatbot = gr.Chatbot(
+                elem_id="chatbot",
+                label="Scroll down and start chatting",
+                visible=False,
+                height=550,
+            )
 
     # build Parameters Accordion
     with gr.Accordion("Parameters", open=False, visible=False) as parameter_row:
