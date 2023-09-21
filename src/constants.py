@@ -1,4 +1,4 @@
-PROJECT_NAME = "ChatDoc"
+PROJECT_NAME = "SmartDoc"
 
 
 USECASES = "USECASES"
