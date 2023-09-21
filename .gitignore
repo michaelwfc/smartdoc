@@ -3,6 +3,7 @@
 data/tmp_files/
 data/vector_stores/
 extrernal_libs/
+langflow/
 Langchain-Chatchat/
 tutorials
 __pycache__/
