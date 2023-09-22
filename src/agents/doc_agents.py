@@ -242,9 +242,9 @@ class DocAgent:
             result = response.get(RESULT)
             # print the source_documents
             source_documents = response[SOURCE_DOCUMENTS]
-            source_documents_text = "\n".join([f"<font color=Blue>***source doc {index}:***</font>\n{doc.page_content}"
+            source_documents_text = "<br>".join([f"<font color=Blue>***source doc {index}:***</font>\n{doc.page_content}"
                                                for index, doc in enumerate(source_documents[:topk_source_documents])])
-            output_text = "\n\n" + source_documents_text
+            output_text = "<br><br>" + source_documents_text
 
             for token in output_text:
                 text += token

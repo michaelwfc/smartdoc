@@ -359,7 +359,7 @@ def build_report(state: State, chatbot: gr.Chatbot, files_input: gr_State):
 
     for index, (query, answer_and_source) in enumerate(chatbot):
         # answer = re.match(pattern= "^[\w\W]*\n\n<font color=Blue>$", string=answer_and_source)
-        answer, source_docs = answer_and_source.split("\n\n")
+        answer, source_docs = answer_and_source.split("<br><br>")
         source_docs = source_docs.replace("<font color=Blue>***", "").replace("***", "").replace("</font>", "")
         row = {"index": index, "query": query, "answer": answer, "source_docs": source_docs}
         data.append(row)
@@ -594,7 +594,7 @@ def run_chat_server(use_openai=True, use_azure_openai=False, use_vicuna=False):
     models = SUPPORT_MODELS
     # # Set authorization credentials
 
-    auth = None
+    auth = ("hackhero", "hackhero")
 
     # Launch the demo
     demo = build_demo(models, args)
