@@ -40,7 +40,7 @@ from servers.gradio_web_server import block_css, get_window_url_params_js, ip_ex
     INPUT_CHAR_LEN_LIMIT, SERVER_ERROR_MSG, ErrorCode
 
 from constants import PROJECT_NAME, GPT_3DOT5_TURBO
-from configs.config import USE_AZURE_OPENAI, USE_VICUNA,  SUPPORT_MODELS, KB_ROOT_PATH, TMP_FILES_DIRNAME
+from configs.config import USE_AZURE_OPENAI, USE_VICUNA, SUPPORT_MODELS, KB_ROOT_PATH, TMP_FILES_DIRNAME
 from utils.environments import set_gpt_env
 from utils.argument_parser import get_webui_args_parser
 
@@ -66,7 +66,7 @@ def build_demo(models, args):
     :return:
     """
     with gr.Blocks(
-            title="AIFE Bot",
+            title="SmartDoc",
             # Gradio themes are the easiest way to customize the look and feel of your app: gr.themes.Base()
             theme=gr.themes.Soft(),
             css=block_css) as demo:
@@ -83,7 +83,7 @@ def build_demo(models, args):
          button_row,
          # parameter_row,
          query_templates_column,
-         doc_uploader_row,
+         doc_uploader_row
          ) = build_single_model_ui(models)
 
         demo.load(
@@ -99,7 +99,7 @@ def build_demo(models, args):
              button_row,
              # parameter_row,
              query_templates_column,
-             doc_uploader_row
+             doc_uploader_row,
              ],
             _js=get_window_url_params_js,
         )
@@ -135,7 +135,6 @@ def load_demo_single(models, url_params):
     )
     # add vs_path_state, file_status_state, model_status_state
     vs_path_state, file_status_state, model_status_state = gr.State(""), gr.State(""), gr.State("")
-
     state = None
     return (
         vs_path_state, file_status_state, model_status_state,
@@ -149,7 +148,9 @@ def load_demo_single(models, url_params):
         # gr.Accordion.update(visible=True),
         # add query templates
         gr.Column.update(visible=True),
-        gr.File.update(visible=True)
+        gr.File.update(visible=True),
+        # add download button
+        # gr.Row.update(visible=True)
     )
 
 
@@ -163,9 +164,7 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
     notice_markdown = f"""# {PROJECT_NAME}"""
     gr.Markdown(notice_markdown, elem_id="notice_markdown")
 
-
     with gr.Row():
-
         # build the model_selector_row, set visible= False
         with gr.Column(elem_id="model_input_column", visible=True, scale=1):
             with gr.Row(elem_id="model_selector_row", visible=True):
@@ -188,9 +187,21 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
             # build Business Query Templates
             with gr.Accordion("Business Query Templates", open=True, visible=True) as query_templates_column:
                 with gr.Column(scale=1, min_width=50):
-                    query_01 = gr.Textbox(label="query_01",show_label=True, value="What is Information of the Manager?")
-                    query_02 = gr.Textbox(label="query_02",show_label=True, value="What is the Investment Objectives?")
-                    query_03 = gr.Textbox(label="query_03",show_label=True, value="How about Interest Rate Risk?")
+                    query_01 = gr.Textbox(label="query_01", show_label=True,
+                                          value="What is Information of the Manager?")
+                    query_02 = gr.Textbox(label="query_02", show_label=True, value="What is the Investment Objectives?")
+                    query_03 = gr.Textbox(label="query_03", show_label=True, value="How about Interest Rate Risk?")
+
+            with gr.Row(elem_id="build_report", visible=True) as build_report_row:
+                with gr.Column(scale=2, min_width=20):
+                    build_report_btn = gr.Button(value="Build Report", visible=True,icon=os.path.join("images","icons","build-report-icon.png"))
+
+                with gr.Column(scale=3, min_width=20):
+                    report_output_file = gr.File(label="Download report here",
+                                                 file_types=[".csv", '.txt', '.md', '.pdf'],
+                                                 file_count="single",
+                                                 show_label=True,
+                                                 visible=False)
 
         with gr.Column(scale=15):
             # build the chatbot
@@ -285,19 +296,19 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
     # upload pdf event: build_vectore_store -> add_query -> bot_response
     files_input.change(build_vectore_store,
                        inputs=[vs_path_state, file_status_state, chatbot, model_selector, files_input],
-                       outputs=[vs_path_state, file_status_state, chatbot], show_progress=True)\
+                       outputs=[vs_path_state, file_status_state, chatbot], show_progress=True) \
         .then(add_query,
               [state, model_selector, query_01],
-              [state, chatbot, textbox] + btn_list)\
+              [state, chatbot, textbox] + btn_list) \
         .then(bot_response,
-            [state, vs_path_state, chatbot, model_selector, temperature, top_p, max_output_tokens],
-            [state, chatbot] + btn_list)\
+              [state, vs_path_state, chatbot, model_selector, temperature, top_p, max_output_tokens],
+              [state, chatbot] + btn_list) \
         .then(add_query,
               [state, model_selector, query_02],
-              [state, chatbot, textbox] + btn_list)\
+              [state, chatbot, textbox] + btn_list) \
         .then(bot_response,
-            [state, vs_path_state, chatbot, model_selector, temperature, top_p, max_output_tokens],
-            [state, chatbot] + btn_list) \
+              [state, vs_path_state, chatbot, model_selector, temperature, top_p, max_output_tokens],
+              [state, chatbot] + btn_list) \
         .then(add_query,
               [state, model_selector, query_03],
               [state, chatbot, textbox] + btn_list) \
@@ -325,9 +336,40 @@ def build_single_model_ui(models: List[Text], add_promotion_links=False, topic_a
         [state, chatbot] + btn_list,
     )
 
+    build_report_btn.click(build_report,
+                           inputs=[state, chatbot, files_input],
+                           outputs=[report_output_file]) \
+                    .then(show_visible,
+                          inputs=[report_output_file],
+                          outputs=[report_output_file]
+              )
 
     return vs_path_state, file_status_state, model_status_state, \
-        state, model_selector, chatbot, textbox, send_btn, button_row,  query_templates_column,  doc_uploader_row
+        state, model_selector, chatbot, textbox, send_btn, button_row, query_templates_column, doc_uploader_row
+
+
+def show_visible(file:gr.File):
+    return gr.update(visible=True)
+
+
+def build_report(state: State, chatbot: gr.Chatbot, files_input: gr_State):
+    import re
+    import pandas as pd
+    data = []
+
+    for index, (query, answer_and_source) in enumerate(chatbot):
+        # answer = re.match(pattern= "^[\w\W]*\n\n<font color=Blue>$", string=answer_and_source)
+        answer, source_docs = answer_and_source.split("\n\n")
+        source_docs = source_docs.replace("<font color=Blue>***", "").replace("***", "").replace("</font>", "")
+        row = {"index": index, "query": query, "answer": answer, "source_docs": source_docs}
+        data.append(row)
+    df = pd.DataFrame(data=data)
+    report_path = os.path.join("data", "tmp_files", "report.csv")
+    if not os.path.exists(os.path.dirname(report_path)):
+        os.makedirs(os.path.dirname(report_path))
+    df.to_csv(report_path,index=False)
+    # update the file
+    return report_path
 
 
 def add_text(state: gr_State, model_selector: Text, text: Text, request: gr.Request):
@@ -422,11 +464,10 @@ def add_query(state: gr_State, model_selector: Text, text: Text, request: gr.Req
     return (state, state.to_gradio_chatbot(), "") + (disable_btn,) * 5
 
 
-
 def build_vectore_store(vs_path_state: gr_State, file_status_state: gr_State, chatbot: gr.Chatbot,
                         model_selector: Text, files: List[Text], request: gr.Request):
     try:
-        vs_builder = VectorStoreBuilder(use_openai=USE_OPENAI,use_vicuna=USE_VICUNA, use_azure_openai=USE_AZURE_OPENAI)
+        vs_builder = VectorStoreBuilder(use_openai=USE_OPENAI, use_vicuna=USE_VICUNA, use_azure_openai=USE_AZURE_OPENAI)
         if not isinstance(files, list):
             files = [files]
         filelist = []
@@ -438,7 +479,7 @@ def build_vectore_store(vs_path_state: gr_State, file_status_state: gr_State, ch
             shutil.move(file.name, os.path.join(temp_file_dir, filename))
             filelist.append(os.path.join(temp_file_dir, filename))
 
-        file_types = ",".join([ get_file_type(file) for file in filelist])
+        file_types = ",".join([get_file_type(file) for file in filelist])
         vs_path, loaded_files = vs_builder.init_knowledge_vector_store(filepath=filelist)
         file_status = f"<font color=Blue>**Success to load {file_types} file!**</font>"
 
@@ -463,7 +504,6 @@ def bot_response(state: State, vs_path_state: gr.State, chat_history: gr.Chatbot
     top_p = float(top_p)
     max_new_tokens = int(max_new_tokens)
 
-
     if state.skip_next:
         # This generate call is skipped due to invalid inputs
         state.skip_next = False
@@ -473,7 +513,7 @@ def bot_response(state: State, vs_path_state: gr.State, chat_history: gr.Chatbot
 
     prompt = conv.to_openai_api_messages()
     # implent the chatdoc agent and add history
-    agent = DocAgent(streaming=True,use_openai=USE_OPENAI,
+    agent = DocAgent(streaming=True, use_openai=USE_OPENAI,
                      use_azure_openai=USE_AZURE_OPENAI, use_vicuna=USE_VICUNA,
                      vs_path=vs_path_state)
     query = prompt[-1]["content"]
@@ -481,7 +521,6 @@ def bot_response(state: State, vs_path_state: gr.State, chat_history: gr.Chatbot
 
     conv.update_last_message("▌")
     yield (state, state.to_gradio_chatbot()) + (disable_btn,) * 5
-
 
     try:
         for data in stream_iter:
@@ -575,8 +614,9 @@ def run_chat_server(use_openai=True, use_azure_openai=False, use_vicuna=False):
 if __name__ == '__main__':
     try:
         logger.info("run chat webui")
-        from configs.config import  USE_OPENAI
-        run_chat_server(use_openai = USE_OPENAI)
+        from configs.config import USE_OPENAI
+
+        run_chat_server(use_openai=USE_OPENAI)
     except Exception as e:
         print(traceback.format_exc())
     # logger.error(e,exc_info=True)
